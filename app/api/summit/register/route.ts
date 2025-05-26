@@ -1,56 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
-import fs from "fs"
-import path from "path"
+import { Registration, loadRegistrationsFromBlob, saveRegistrationsToBlob } from "@/lib/blob-storage"
 
-// Define the data directory and file path
-const DATA_DIR = path.join(process.cwd(), "data")
-const REGISTRATIONS_FILE = path.join(DATA_DIR, "registrations.json")
 
-// Type for registration data
-type Registration = {
-  regId: string
-  influencerId: string
-  email: string
-  name?: string
-  registeredAt: string
+// Read registrations from Vercel Blob
+async function readRegistrations(): Promise<Registration[]> {
+  return await loadRegistrationsFromBlob()
 }
 
-
-// Ensure data directory exists
-function ensureDataDirExists() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true })
-  }
-}
-
-// Read registrations from JSON file
-function readRegistrations(): Registration[] {
-  ensureDataDirExists()
-
-  if (!fs.existsSync(REGISTRATIONS_FILE)) {
-    // Create empty registrations file if it doesn't exist
-    fs.writeFileSync(REGISTRATIONS_FILE, JSON.stringify([]), "utf8")
-    return []
-  }
-
-  try {
-    const data = fs.readFileSync(REGISTRATIONS_FILE, "utf8")
-    return JSON.parse(data)
-  } catch (error) {
-    console.error("Error reading registrations file:", error)
-    return []
-  }
-}
-
-// Write registrations to JSON file
-function writeRegistrations(registrations: Registration[]) {
-  ensureDataDirExists()
-
-  try {
-    fs.writeFileSync(REGISTRATIONS_FILE, JSON.stringify(registrations, null, 2), "utf8")
-  } catch (error) {
-    console.error("Error writing registrations file:", error)
-  }
+// Write registrations to Vercel Blob
+async function writeRegistrations(registrations: Registration[]) {
+  await saveRegistrationsToBlob(registrations)
 }
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Read existing registrations
-    const registrations = readRegistrations()
+    const registrations = await readRegistrations()
 
     // Check if already registered
     const existingRegistration = registrations.find((reg) => reg.influencerId === influencerId)
@@ -102,9 +61,9 @@ export async function POST(request: NextRequest) {
 
     // Add to registrations and save
     registrations.push(registration)
-    writeRegistrations(registrations)
+    await writeRegistrations(registrations)
 
-    return NextResponse.json({ regId }, { status: 201,headers:corsHeaders })
+    return NextResponse.json({ regId }, { status: 201, headers: corsHeaders })
   } catch (error) {
     console.error("Summit registration error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -112,6 +71,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  const registrations = readRegistrations()
+  const registrations = await readRegistrations()
   return NextResponse.json({ registrations }, { status: 200, headers: corsHeaders })
 }

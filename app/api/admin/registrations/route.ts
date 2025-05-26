@@ -1,10 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import fs from "fs"
-import path from "path"
-
-// Define the data directory and file path
-const DATA_DIR = path.join(process.cwd(), "data")
-const REGISTRATIONS_FILE = path.join(DATA_DIR, "registrations.json")
+import { loadRegistrationsFromBlob, saveRegistrationsToBlob } from "@/lib/blob-storage"
 
 // Simple admin authentication middleware
 // In a real app, this would be more secure
@@ -31,15 +26,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Check if file exists
-    if (!fs.existsSync(REGISTRATIONS_FILE)) {
-      return NextResponse.json({ registrations: [] }, { headers: corsHeaders })
-    }
-
-    // Read registrations file
-    const data = fs.readFileSync(REGISTRATIONS_FILE, "utf8")
-    const registrations = JSON.parse(data)
-
+    // Read registrations from Vercel Blob
+    const registrations = await loadRegistrationsFromBlob()
+    
     return NextResponse.json({ registrations }, { headers: corsHeaders })
   } catch (error) {
     console.error("Error reading registrations:", error)
@@ -61,14 +50,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Registration ID is required" }, { status: 400, headers: corsHeaders })
     }
 
-    // Check if file exists
-    if (!fs.existsSync(REGISTRATIONS_FILE)) {
-      return NextResponse.json({ error: "No registrations found" }, { status: 404, headers: corsHeaders })
-    }
-
-    // Read registrations file
-    const data = fs.readFileSync(REGISTRATIONS_FILE, "utf8")
-    const registrations = JSON.parse(data)
+    // Read registrations from Vercel Blob
+    const registrations = await loadRegistrationsFromBlob()
 
     // Find registration index
     const index = registrations.findIndex((reg: any) => reg.regId === regId)
@@ -80,8 +63,8 @@ export async function DELETE(request: NextRequest) {
     // Remove registration
     registrations.splice(index, 1)
 
-    // Write updated registrations back to file
-    fs.writeFileSync(REGISTRATIONS_FILE, JSON.stringify(registrations, null, 2), "utf8")
+    // Write updated registrations back to Vercel Blob
+    await saveRegistrationsToBlob(registrations)
 
     return NextResponse.json({ success: true }, { headers: corsHeaders })
   } catch (error) {
