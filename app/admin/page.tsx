@@ -185,7 +185,7 @@ export default function AdminPage() {
             <div className="bg-blue-50 p-4 rounded-md text-sm text-blue-800">
               <p className="font-semibold">Note:</p>
               <p>
-                This is a simple admin interface for demonstration purposes. In a production environment, you would
+                This is a simple admin interface for demonstration purposes. In a production environment, I would
                 implement proper authentication, authorization, and additional features like filtering, sorting, and
                 pagination.
               </p>
