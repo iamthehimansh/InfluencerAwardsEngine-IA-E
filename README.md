@@ -61,10 +61,10 @@ To embed the registration widget in any website, add the following code:
 ```html
 <!-- Summit Registration Widget -->
 <div id="summit-widget-container"></div>
-<script src="https://your-domain.com/summit-register.js"></script>
+<script src="https://influencer-awards-engine-ia-e.vercel.app/summit-register.js"></script>
 <script>
   new SummitRegistrationWidget({
-    apiBaseUrl: "https://your-domain.com", // Your API base URL
+    apiBaseUrl: "https://influencer-awards-engine-ia-e.vercel.app/", // Your API base URL
     influencerId: "INF_CUSTOM_ID", // Optional custom influencer ID
     theme: "default" // Optional theme (default, dark, light)
   });
