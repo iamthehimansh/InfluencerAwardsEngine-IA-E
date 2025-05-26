@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '');
+serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
 // Type for registration data
 export type Registration = {
   regId: string;
