@@ -87,11 +87,11 @@ export default function Home() {
           <div className="bg-white rounded-2xl p-8 shadow-2xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">💾 Data Storage</h2>
             <p className="text-gray-600 mb-6">
-              All registrations are stored securely in a JSON file on the server, with proper error handling and
-              validation.
+              All registrations are stored securely in a Firebase firestore database. You can view the registrations
+              data in the Firebase console.
             </p>
             <div className="bg-gray-100 p-3 rounded-lg">
-              <code className="text-sm">data/registrations.json</code>
+              <code className="text-sm">influencer-awards-engine-ia-e/registrations/*</code>
             </div>
           </div>
         </div>
