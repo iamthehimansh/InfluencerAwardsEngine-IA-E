@@ -1,15 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { Registration, loadRegistrationsFromBlob, saveRegistrationsToBlob } from "@/lib/blob-storage"
+import { Registration, loadRegistrationsFromFirestore, saveRegistrationsToFirestore, generateUniqueRegistrationId } from "@/lib/firestore"
 
 
-// Read registrations from Vercel Blob
+// Read registrations from Firestore
 async function readRegistrations(): Promise<Registration[]> {
-  return await loadRegistrationsFromBlob()
+  return await loadRegistrationsFromFirestore()
 }
 
-// Write registrations to Vercel Blob
+// Write registrations to Firestore
 async function writeRegistrations(registrations: Registration[]) {
-  await saveRegistrationsToBlob(registrations)
+  await saveRegistrationsToFirestore(registrations)
 }
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,14 +41,14 @@ export async function POST(request: NextRequest) {
     const registrations = await readRegistrations()
 
     // Check if already registered
-    const existingRegistration = registrations.find((reg) => reg.influencerId === influencerId)
+    const existingRegistration = registrations.find((reg) => reg.influencerId === influencerId || reg.email === email)
 
     if (existingRegistration) {
       return NextResponse.json({ error: "Influencer already registered for summit" }, { status: 409 })
     }
 
-    // Generate registration ID
-    const regId = `SR_${String(registrations.length + 1).padStart(3, "0")}`
+    // Generate unique registration ID using the new function
+    const regId = generateUniqueRegistrationId(registrations)
 
     // Create registration record
     const registration: Registration = {

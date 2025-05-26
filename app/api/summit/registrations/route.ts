@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { Registration, loadRegistrationsFromBlob } from "@/lib/blob-storage"
+import { Registration, loadRegistrationsFromFirestore } from "@/lib/firestore"
 
-// Read registrations from Vercel Blob
+// Read registrations from Firestore
 async function readRegistrations(): Promise<Registration[]> {
-  return await loadRegistrationsFromBlob()
+  return await loadRegistrationsFromFirestore()
 }
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const influencerId = searchParams.get("influencerId")
 
-  // Read registrations from Vercel Blob
+  // Read registrations from Firestore
   const registrations = await readRegistrations()
 
   if (influencerId) {

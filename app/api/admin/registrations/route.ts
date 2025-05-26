@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { loadRegistrationsFromBlob, saveRegistrationsToBlob } from "@/lib/blob-storage"
+import { loadRegistrationsFromFirestore, saveRegistrationsToFirestore, deleteRegistrationFromFirestore } from "@/lib/firestore"
 
 // Simple admin authentication middleware
 // In a real app, this would be more secure
@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Read registrations from Vercel Blob
-    const registrations = await loadRegistrationsFromBlob()
+    // Read registrations from Firestore
+    const registrations = await loadRegistrationsFromFirestore()
     
     return NextResponse.json({ registrations }, { headers: corsHeaders })
   } catch (error) {
@@ -50,8 +50,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Registration ID is required" }, { status: 400, headers: corsHeaders })
     }
 
-    // Read registrations from Vercel Blob
-    const registrations = await loadRegistrationsFromBlob()
+    // Read registrations from Firestore
+    const registrations = await loadRegistrationsFromFirestore()
 
     // Find registration index
     const index = registrations.findIndex((reg: any) => reg.regId === regId)
@@ -60,11 +60,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Registration not found" }, { status: 404, headers: corsHeaders })
     }
 
-    // Remove registration
-    registrations.splice(index, 1)
-
-    // Write updated registrations back to Vercel Blob
-    await saveRegistrationsToBlob(registrations)
+    // Delete registration directly from Firestore
+    const success = await deleteRegistrationFromFirestore(regId)
+    
+    if (!success) {
+      return NextResponse.json({ error: "Failed to delete registration" }, { status: 500, headers: corsHeaders })
+    }
 
     return NextResponse.json({ success: true }, { headers: corsHeaders })
   } catch (error) {

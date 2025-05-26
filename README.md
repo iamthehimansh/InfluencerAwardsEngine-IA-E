@@ -1,20 +1,24 @@
 # Summit Registration Widget
 
-A Next.js application for managing summit registrations with a widget that can be embedded in any website.
+## Overview
+
+This is a registration widget for summits and events, designed to be embedded in any website. It allows influencers to register for events and provides an admin interface to manage registrations.
 
 ## Features
 
-- Embeddable registration widget for any website
-- Admin dashboard to view and manage registrations
-- API endpoints for registration data
-- Vercel Blob storage for data persistence
+- Embeddable registration widget
+- Admin dashboard for registration management
+- Firebase Firestore database for data storage
+- CORS-enabled API endpoints
+- Responsive design
 
-## Getting Started
+## Setup
 
 ### Prerequisites
 
-- Node.js 18+ and npm/pnpm
-- Vercel account (for Blob storage)
+- Node.js (v18 or later)
+- npm or pnpm
+- Firebase project with Firestore database
 
 ### Installation
 
@@ -27,16 +31,29 @@ npm install
 pnpm install
 ```
 
-3. Set up Vercel Blob storage:
-   - Create a Blob store in your Vercel dashboard
-   - Copy the read-write token
-   - Create a `.env.local` file in the project root with:
+### Firebase Setup
+
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable Firestore database in your project
+3. Generate a service account key:
+   - Go to Project Settings > Service Accounts
+   - Click "Generate new private key"
+   - Save the JSON file as `firebase-service-account.json` in the root of this project
+
+4. Update the Firebase configuration in `lib/firestore.ts` if needed
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
 
 ```
-BLOB_READ_WRITE_TOKEN=your_token_here
+# Firebase (Optional - can use service account JSON file instead)
+FIREBASE_SERVICE_ACCOUNT='{JSON_CONTENT}'
 ```
 
-4. Run the development server:
+## Development
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -44,50 +61,55 @@ npm run dev
 pnpm dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-### Migrating Existing Data
-
-If you have existing registration data in the local JSON file, you can migrate it to Vercel Blob storage using the provided script:
-
-```bash
-node scripts/migrate-to-blob.js
-```
-
-## Embedding the Widget
-
-To embed the registration widget in any website, add the following code:
-
-```html
-<!-- Summit Registration Widget -->
-<div id="summit-widget-container"></div>
-<script src="https://influencer-awards-engine-ia-e.vercel.app/summit-register.js"></script>
-<script>
-  new SummitRegistrationWidget({
-    apiBaseUrl: "https://influencer-awards-engine-ia-e.vercel.app/", // Your API base URL
-    influencerId: "INF_CUSTOM_ID", // Optional custom influencer ID
-    theme: "default" // Optional theme (default, dark, light)
-  });
-</script>
-```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## API Endpoints
 
-- `POST /api/summit/register` - Register for the summit
-- `GET /api/summit/registrations` - Get all registrations (or filter by influencerId)
-- `GET /api/admin/registrations` - Admin endpoint to get all registrations
-- `DELETE /api/admin/registrations?regId=ID` - Admin endpoint to delete a registration
+### Summit Registration
 
-## Vercel Blob Storage
+- `POST /api/summit/register` - Register for a summit
+- `GET /api/summit/registrations` - Get all registrations
+- `GET /api/summit/registrations?influencerId=123` - Get registrations for a specific influencer
 
-This application uses Vercel Blob for data storage. The registration data is stored as a JSON file in the Blob storage, which provides:
+### Admin
 
-- Scalable and reliable storage
-- Global CDN distribution
-- Automatic backups
-- No need for database management
+- `GET /api/admin/registrations` - Get all registrations (requires API key)
+- `DELETE /api/admin/registrations?regId=SR_001` - Delete a registration (requires API key)
 
-The implementation uses the `@vercel/blob` SDK to interact with the Blob storage service.
+## Embedding the Widget
+
+Add the following script to your website:
+
+```html
+<script src="https://your-deployment-url.vercel.app/summit-register.js" defer></script>
+<div id="summit-register" data-influencer-id="YOUR_INFLUENCER_ID"></div>
+```
+
+## Admin Access
+
+Access the admin dashboard at `/admin`. Use the API key for authentication:
+
+```
+API Key: admin-secret-key
+```
+
+## Migrating Data
+
+If you have existing registration data, you can migrate it to Firestore using the provided script:
+
+```bash
+node scripts/migrate-to-firestore.js
+```
+
+## Deployment
+
+Deploy to Vercel:
+
+```bash
+vercel
+```
+
+Make sure to set the environment variables in your Vercel project settings.
 
 ## License
 
