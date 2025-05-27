@@ -430,7 +430,7 @@ new BadgeNotificationWidget({
     
     <script>
         let badgeWidget;
-        const apiBaseUrl = "https://influencer-awards-engine-ia-e.vercel.app";
+        const apiBaseUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://influencer-awards-engine-ia-e.vercel.app';
         // Initialize the badge notification widget if loaded via script tag without data attribute
         // document.addEventListener('DOMContentLoaded', function() {
         //     badgeWidget = new BadgeNotificationWidget({

@@ -2,7 +2,7 @@
   // Badge Notification Widget
   class BadgeNotificationWidget {
     constructor(options = {}) {
-      this.apiBaseUrl = options.apiBaseUrl ||  "https://influencer-awards-engine-ia-e.vercel.app"
+      this.apiBaseUrl = options.apiBaseUrl || (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://influencer-awards-engine-ia-e.vercel.app')
       this.influencerId = options.influencerId || "INF_" + Math.random().toString(36).substr(2, 9)
       this.containerId = options.containerId || "badge-notification-container"
       this.checkInterval = options.checkInterval || 30000 // 30 seconds

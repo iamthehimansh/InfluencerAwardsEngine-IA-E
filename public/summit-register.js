@@ -2,7 +2,7 @@
   // Summit Registration Widget
   class SummitRegistrationWidget {
     constructor(options = {}) {
-      this.apiBaseUrl = options.apiBaseUrl || "https://influencer-awards-engine-ia-e.vercel.app"
+      this.apiBaseUrl = options.apiBaseUrl || (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://influencer-awards-engine-ia-e.vercel.app')
       this.containerId = options.containerId || "summit-widget-container"
       this.influencerId = options.influencerId || "INF_" + Math.random().toString(36).substr(2, 9)
       this.theme = options.theme || "default"
