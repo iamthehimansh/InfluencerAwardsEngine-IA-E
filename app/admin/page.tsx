@@ -7,8 +7,11 @@ import { Trash2 } from "lucide-react"
 
 export default function AdminPage() {
   const [registrations, setRegistrations] = useState<any[]>([])
+  const [badges, setBadges] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [badgesLoading, setBadgesLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [badgesError, setBadgesError] = useState<string | null>(null)
   const [apiKey, setApiKey] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
@@ -41,7 +44,35 @@ export default function AdminPage() {
     }
   }
 
-  const handleDelete = async (regId: string) => {
+  const fetchBadges = async () => {
+    setBadgesLoading(true)
+    setBadgesError(null)
+
+    try {
+      const response = await fetch("/api/badges", {
+        headers: {
+          "x-api-key": apiKey,
+        },
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setIsAuthenticated(false)
+          throw new Error("Unauthorized. Please check your API key.")
+        }
+        throw new Error("Failed to fetch badges")
+      }
+
+      const data = await response.json()
+      setBadges(data || [])
+    } catch (err: any) {
+      setBadgesError(err.message)
+    } finally {
+      setBadgesLoading(false)
+    }
+  }
+
+  const handleDeleteRegistration = async (regId: string) => {
     if (!confirm("Are you sure you want to delete this registration?")) {
       return
     }
@@ -70,9 +101,34 @@ export default function AdminPage() {
     fetchRegistrations()
   }
 
+  const handleDeleteBadge = async (badgeId: string) => {
+    if (!confirm("Are you sure you want to delete this badge?")) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/badges/${badgeId}`, {
+        method: "DELETE",
+        headers: {
+          "x-api-key": apiKey,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete badge")
+      }
+
+      // Refresh badges
+      fetchBadges()
+    } catch (err: any) {
+      setBadgesError(err.message)
+    }
+  }
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchRegistrations()
+      fetchBadges()
     }
   }, [isAuthenticated])
 
@@ -110,16 +166,17 @@ export default function AdminPage() {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Summit Registrations</h2>
-                <button
-                  onClick={fetchRegistrations}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
-                >
-                  Refresh
-                </button>
-              </div>
+            <div className="space-y-8">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Summit Registrations</h2>
+                  <button
+                    onClick={fetchRegistrations}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    Refresh
+                  </button>
+                </div>
 
               {loading ? (
                 <div className="text-center py-8">
@@ -167,7 +224,7 @@ export default function AdminPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <button
-                              onClick={() => handleDelete(reg.regId)}
+                              onClick={() => handleDeleteRegistration(reg.regId)}
                               className="text-red-600 hover:text-red-800"
                               title="Delete registration"
                             >
@@ -182,14 +239,74 @@ export default function AdminPage() {
               )}
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-md text-sm text-blue-800">
-              <p className="font-semibold">Note:</p>
-              <p>
-                This is a simple admin interface for demonstration purposes. In a production environment, I would
-                implement proper authentication, authorization, and additional features like filtering, sorting, and
-                pagination.
-              </p>
-            </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Badges</h2>
+                  <button
+                    onClick={fetchBadges}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    Refresh
+                  </button>
+                </div>
+
+                {badgesLoading ? (
+                  <div className="text-center py-8">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+                    <p className="mt-2 text-gray-600">Loading badges...</p>
+                  </div>
+                ) : badgesError ? (
+                  <div className="bg-red-50 text-red-600 p-4 rounded-md">{badgesError}</div>
+                ) : badges.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">No badges found.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Badge ID
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Influencer ID
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Badge
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Awarded At
+                          </th>
+
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {badges.map((badge) => (
+                          <tr key={badge.badgeId} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{badge.badgeId}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{badge.influencerId}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{badge.badge}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(badge.awardedAt).toLocaleString()}
+                            </td>
+
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-md text-sm text-blue-800">
+                <p className="font-semibold">Note:</p>
+                <p>
+                  This is a simple admin interface for demonstration purposes. In a production environment, I would
+                  implement proper authentication, authorization, and additional features like filtering, sorting, and
+                  pagination.
+                </p>
+              </div>
           </>
         )}
       </div>

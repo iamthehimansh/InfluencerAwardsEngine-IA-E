@@ -1,116 +1,218 @@
-# Summit Registration Widget
+# 🏆 Influencer Awards Engine
 
-## Overview
+A plug-and-play backend + JS library for running quarterly awards, monthly micro-contests, leaderboards, and badge issuance. Simply drop in the scripts or hit the APIs to get started.
 
-This is a registration widget for summits and events, designed to be embedded in any website. It allows influencers to register for events and provides an admin interface to manage registrations.
+[![Deploy with Vercel](https://vercel.com/button)](https://influencer-awards-engine-ia-e.vercel.app)
 
-## Features
+## 🚀 Quick Links
 
-- Embeddable registration widget
+- [Landing Page](https://influencer-awards-engine-ia-e.vercel.app)
+- [Summit Registration Demo](https://influencer-awards-engine-ia-e.vercel.app/summit-demo.html)
+- [Badge System Demo](https://influencer-awards-engine-ia-e.vercel.app/badge-demo.html)
+- [Admin Panel](https://influencer-awards-engine-ia-e.vercel.app/admin)
+
+## 🎯 Features
+
+### Summit Registration Widget
+
+- Beautiful, responsive registration form
+- Real-time validation and error handling
+- Customizable themes and styling
+- Secure API integration
 - Admin dashboard for registration management
-- Firebase Firestore database for data storage
-- CORS-enabled API endpoints
-- Responsive design
 
-## Setup
+### Badge Issuance & Notification System
 
-### Prerequisites
+- Real-time badge notifications
+- Audio alerts with Web Audio API
+- Badge management interface
+- Mobile-responsive design
+- Secure badge issuance API
 
-- Node.js (v18 or later)
-- npm or pnpm
-- Firebase project with Firestore database
+## 🔌 Integration Guide
 
-### Installation
+### 1. Summit Registration Widget
 
-1. Clone the repository
-2. Install dependencies:
+```html
+<!-- Add the widget script -->
+<script src="https://influencer-awards-engine-ia-e.vercel.app/summit-register.js"></script>
 
-```bash
-npm install
-# or
-pnpm install
+<!-- Add the container -->
+<div id="summit-widget-container"></div>
+
+<!-- Initialize with custom options (optional) -->
+<script>
+new SummitRegistrationWidget({
+    influencerId: 'INF_123',
+    apiBaseUrl: 'https://influencer-awards-engine-ia-e.vercel.app',
+    theme: 'custom'
+});
+</script>
 ```
 
-### Firebase Setup
+### 2. Badge Notification System
 
-1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable Firestore database in your project
-3. Generate a service account key:
-   - Go to Project Settings > Service Accounts
-   - Click "Generate new private key"
-   - Save the JSON file as `firebase-service-account.json` in the root of this project
+```html
+<!-- Method 1: Auto-initialization with data attribute -->
+<script 
+  src="https://influencer-awards-engine-ia-e.vercel.app/badge-notify.js" 
+  data-influencer-id="INF_123">
+</script>
 
-4. Update the Firebase configuration in `lib/firestore.ts` if needed
-
-### Environment Variables
-
-Create a `.env.local` file in the root directory with the following variables:
-
-```
-# Firebase (Optional - can use service account JSON file instead)
-FIREBASE_SERVICE_ACCOUNT='{JSON_CONTENT}'
-```
-
-## Development
-
-Run the development server:
-
-```bash
-npm run dev
-# or
-pnpm dev
+<!-- Method 2: Manual initialization with options -->
+<script src="https://influencer-awards-engine-ia-e.vercel.app/badge-notify.js"></script>
+<script>
+new BadgeNotificationWidget({
+    influencerId: 'INF_123',
+    apiBaseUrl: 'https://influencer-awards-engine-ia-e.vercel.app',
+    checkInterval: 30000 // Check every 30 seconds
+});
+</script>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## API Endpoints
+## 🔧 API Reference
 
 ### Summit Registration
 
-- `POST /api/summit/register` - Register for a summit
-- `GET /api/summit/registrations` - Get all registrations
-- `GET /api/summit/registrations?influencerId=123` - Get registrations for a specific influencer
+```http
+POST /api/summit/register
+Content-Type: application/json
 
-### Admin
+{
+  "influencerId": "INF_123",
+  "email": "chef@example.com",
+  "name": "Chef Gordon"
+}
 
-- `GET /api/admin/registrations` - Get all registrations (requires API key)
-- `DELETE /api/admin/registrations?regId=SR_001` - Delete a registration (requires API key)
-
-## Embedding the Widget
-
-Add the following script to your website:
-
-```html
-<script src="https://your-deployment-url.vercel.app/summit-register.js" defer></script>
-<div id="summit-register" data-influencer-id="YOUR_INFLUENCER_ID"></div>
+Response: { "regId": "SR_001" }
 ```
 
-## Admin Access
+### Badge System
 
-Access the admin dashboard at `/admin`. Use the API key for authentication:
+```http
+# Issue Badge
+POST /api/badges/issue
+Content-Type: application/json
 
+{
+  "influencerId": "INF_123",
+  "badge": "TopChef"
+}
+
+Response: { "badgeId": "BD_001" }
+
+# Fetch Badges
+GET /api/badges?influencerId=INF_123
+
+Response: [
+  {
+    "badgeId": "BD_001",
+    "influencerId": "INF_123",
+    "badge": "TopChef",
+    "awardedAt": "2024-01-15T10:30:00.000Z"
+  }
+]
+```
+
+## 🛠️ Technical Specifications
+
+### Frontend
+- Next.js 15 with App Router
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Vanilla JavaScript widgets (no dependencies)
+- Web Audio API for notifications
+- Responsive design with mobile-first approach
+
+### Backend
+- Next.js API Routes
+- Firebase Firestore for data storage
+- Real-time data synchronization
+- RESTful API architecture
+- Input validation and error handling
+
+### Security
+- API key authentication for admin access
+- Input sanitization and validation
+- CORS protection
+- Rate limiting
+- Error handling and logging
+
+### Performance
+- Optimized bundle size
+- Lazy loading of components
+- Efficient real-time updates
+- Caching strategies
+- CDN deployment
+
+## 🎨 Widget Customization
+
+Both widgets support extensive customization through options:
+
+```javascript
+// Summit Registration Widget Options
+{
+  containerId: 'custom-container',
+  influencerId: 'INF_123',
+  apiBaseUrl: 'https://your-api.com',
+  theme: 'custom'
+}
+
+// Badge Notification Widget Options
+{
+  containerId: 'badge-container',
+  influencerId: 'INF_123',
+  apiBaseUrl: 'https://your-api.com',
+  checkInterval: 30000,
+  theme: 'custom'
+}
+```
+
+## 📱 Mobile Responsiveness
+
+Both widgets are fully responsive and tested across:
+- Desktop browsers (Chrome, Firefox, Safari, Edge)
+- Mobile devices (iOS, Android)
+- Tablets and iPads
+- Different screen sizes and orientations
+
+## 🔒 Admin Panel
+
+Access the admin panel at `/admin` to:
+- View and manage summit registrations
+- Monitor badge issuance
+- View analytics and statistics
+- Manage influencer data
+
+Demo credentials:
 ```
 API Key: admin-secret-key
 ```
 
-## Migrating Data
+## 🚀 Deployment
 
-If you have existing registration data, you can migrate it to Firestore using the provided script:
+The project is deployed on Vercel and can be accessed at:
+[https://influencer-awards-engine-ia-e.vercel.app](https://influencer-awards-engine-ia-e.vercel.app)
 
-```bash
-node scripts/migrate-to-firestore.js
+## 📦 Project Structure
+
+```
+├── app/
+│   ├── admin/         # Admin panel
+│   ├── api/          # API routes
+│   └── page.tsx      # Landing page
+├── public/
+│   ├── badge-notify.js    # Badge widget
+│   ├── summit-register.js  # Summit widget
+│   ├── badge-demo.html     # Badge demo page
+│   └── summit-demo.html    # Summit demo page
+└── components/      # UI components
 ```
 
-## Deployment
+## 🤝 Contributing
 
-Deploy to Vercel:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```bash
-vercel
-```
+## 📄 License
 
-Make sure to set the environment variables in your Vercel project settings.
-
-## License
-
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.

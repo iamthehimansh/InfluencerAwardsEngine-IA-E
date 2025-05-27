@@ -11,8 +11,17 @@ export type Registration = {
   registeredAt: string;
 };
 
-// Collection name for registrations in Firestore
+// Type for badge data
+export type Badge = {
+  badgeId: string;
+  influencerId: string;
+  badge: string;
+  awardedAt: string;
+};
+
+// Collection names for Firestore
 const REGISTRATIONS_COLLECTION = 'registrations';
+const BADGES_COLLECTION = 'badges';
 
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
@@ -118,4 +127,69 @@ export function generateUniqueRegistrationId(existingRegistrations: Registration
   
   // Generate new ID with the next number
   return `SR_${String(highestNum + 1).padStart(3, '0')}`;
+}
+
+/**
+ * Save a badge to Firestore
+ * @param badge Badge object to save
+ * @returns Promise that resolves when badge is saved
+ */
+export async function saveBadgeToFirestore(badge: Badge) {
+  try {
+    const docRef = db.collection(BADGES_COLLECTION).doc(badge.badgeId);
+    await docRef.set(badge);
+    console.log('Badge saved to Firestore successfully');
+    return true;
+  } catch (error) {
+    console.error('Error saving badge to Firestore:', error);
+    throw error;
+  }
+}
+
+/**
+ * Load badges data from Firestore
+ * @returns Promise that resolves with array of badge objects
+ */
+export async function loadBadgesFromFirestore(): Promise<Badge[]> {
+  try {
+    const snapshot = await db.collection(BADGES_COLLECTION).get();
+    
+    if (snapshot.empty) {
+      console.log('No badges found in Firestore, returning empty array');
+      return [];
+    }
+    
+    const badges: Badge[] = [];
+    snapshot.forEach(doc => {
+      badges.push(doc.data() as Badge);
+    });
+    
+    return badges;
+  } catch (error) {
+    console.log('Error loading badges from Firestore, returning empty array:', error);
+    return [];
+  }
+}
+
+/**
+ * Generate a unique badge ID
+ * @param existingBadges Array of existing badge objects
+ * @returns A unique badge ID
+ */
+export function generateUniqueBadgeId(existingBadges: Badge[]): string {
+  // Get the highest existing ID number
+  const existingIds = existingBadges.map(badge => badge.badgeId);
+  let highestNum = 0;
+  
+  existingIds.forEach(id => {
+    if (id.startsWith('BD_')) {
+      const numPart = parseInt(id.substring(3), 10);
+      if (!isNaN(numPart) && numPart > highestNum) {
+        highestNum = numPart;
+      }
+    }
+  });
+  
+  // Generate new ID with the next number
+  return `BD_${String(highestNum + 1).padStart(3, '0')}`;
 }
