@@ -444,7 +444,7 @@
     const script = document.querySelector('script[data-influencer-id]')
     if (script) {
       const influencerId = script.getAttribute('data-influencer-id')
-      new BadgeNotificationWidget({ influencerId })
+      window.BadgeNotificationWidgetObject =new BadgeNotificationWidget({ influencerId })
     }
   })
 
