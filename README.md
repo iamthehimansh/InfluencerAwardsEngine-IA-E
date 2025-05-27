@@ -2,14 +2,62 @@
 
 A plug-and-play backend + JS library for running quarterly awards, monthly micro-contests, leaderboards, and badge issuance. Simply drop in the scripts or hit the APIs to get started.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://influencer-awards-engine-ia-e.vercel.app)
-
 ## 🚀 Quick Links
 
 - [Landing Page](https://influencer-awards-engine-ia-e.vercel.app)
 - [Summit Registration Demo](https://influencer-awards-engine-ia-e.vercel.app/summit-demo.html)
 - [Badge System Demo](https://influencer-awards-engine-ia-e.vercel.app/badge-demo.html)
 - [Admin Panel](https://influencer-awards-engine-ia-e.vercel.app/admin)
+
+## 📥 Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/iamthehimansh/candidate-003-awards-module-himansh.git
+cd candidate-003-awards-module-himansh
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+pnpm install
+```
+
+3. Set up Firebase:
+   - Create a new Firebase project
+   - Enable Firestore Database
+   - Generate a service account key from Project Settings > Service Accounts
+   - Create a `.env.local` file and add your Firebase configuration as a stringified JSON:
+```bash
+# Important: The entire service account JSON must be stringified
+# Example of correct format:
+FIREBASE_SERVICE_ACCOUNT='{"type":"service_account","project_id":"your-project-id"...}'
+
+# Actual configuration (replace with your values):
+FIREBASE_SERVICE_ACCOUNT='{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "your-private-key-id",
+  "private_key": "your-private-key",
+  "client_email": "your-client-email",
+  "client_id": "your-client-id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "your-client-cert-url"
+}'
+```
+Note: Make sure to stringify the JSON and escape any special characters in the private key.
+
+4. Run the development server:
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## 🎯 Features
 
@@ -191,7 +239,23 @@ API Key: admin-secret-key
 
 ## 🚀 Deployment
 
-The project is deployed on Vercel and can be accessed at:
+1. Create a Vercel account if you haven't already
+2. Install Vercel CLI:
+```bash
+npm i -g vercel
+```
+
+3. Deploy to Vercel:
+```bash
+vercel
+```
+
+4. Add environment variables in Vercel:
+   - Go to your project settings
+   - Add `FIREBASE_SERVICE_ACCOUNT` with your stringified Firebase service account JSON
+   - Redeploy if needed
+
+The demo is deployed at:
 [https://influencer-awards-engine-ia-e.vercel.app](https://influencer-awards-engine-ia-e.vercel.app)
 
 ## 📦 Project Structure

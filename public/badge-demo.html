@@ -444,6 +444,10 @@ new BadgeNotificationWidget({
         //     console.log('Badge Notification Demo Loaded');
         // });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshStats();
+        })
+
         async function issueBadge() {
             const influencerId = document.getElementById('influencer-id').value;
             const badgeType = document.getElementById('badge-type').value;
