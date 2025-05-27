@@ -470,7 +470,7 @@ new BadgeNotificationWidget({
                 
                 if (response.ok) {
                     showResponse(`Badge issued successfully!\nBadge ID: ${data.badgeId}`, 'success');
-                    
+                    window.BadgeNotificationWidget.checkNow();
                     // Refresh stats after issuing badge
                     setTimeout(refreshStats, 1000);
                     
